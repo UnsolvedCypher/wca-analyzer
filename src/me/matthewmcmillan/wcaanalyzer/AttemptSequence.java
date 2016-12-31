@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class AttemptSequence {
-    public AttemptSequence(String eventName, String round, String comp, int place, String rawResults, String average) {
+    public AttemptSequence(String eventName, String round, Competition comp, int place, String rawResults, String average) {
         this.round = round;
         this.comp = comp;
         this.place = place;
@@ -15,7 +15,8 @@ public class AttemptSequence {
         }
     }
 
-    private String comp, round, eventName;
+    private String round, eventName;
+    private Competition comp;
     private int place;
     Result average;
     private ArrayList<Result> results;
@@ -44,7 +45,7 @@ public class AttemptSequence {
         return average;
     }
 
-    private ArrayList<Result> parseRawResults(String rawResults, String comp, String round) {
+    private ArrayList<Result> parseRawResults(String rawResults, Competition comp, String round) {
         ArrayList<Result> parsedResults = new ArrayList<>();
         for (String result : rawResults.split(" " + (char)160 + " ")) {
             if (eventName.equals("3x3x3 Fewest Moves")) {

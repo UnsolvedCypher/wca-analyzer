@@ -78,7 +78,7 @@ public class WCAReader {
                             String compURL = data.get(0).select("a").get(0).attr("href");
                             comps.put(currentComp, new Competition(currentComp, compURL));
                         }
-                        comps.get(currentComp).addAttemptSequence(currentEventName, new AttemptSequence(currentEventName, round, currentComp, place, rawResults, average));
+                        comps.get(currentComp).addAttemptSequence(currentEventName, new AttemptSequence(currentEventName, round, comps.get(currentComp), place, rawResults, average));
                     } else if (!row.select("th").isEmpty()) {
                         for (Element header : row.select("th")) {
                             if (header.text().equals("Competition")) {

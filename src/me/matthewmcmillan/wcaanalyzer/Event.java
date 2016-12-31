@@ -66,6 +66,26 @@ public class Event {
         return new ArrayList<Result> (allResults.subList(0, numOfTimes));
     }
 
+    public ArrayList<Result> getWorstSingles(int numOfTimes) {
+        ArrayList<Result> allResults = getNonDNFSingles();
+        Collections.sort(allResults);
+
+        if (numOfTimes > allResults.size()) {
+            numOfTimes = allResults.size();
+        }
+        return new ArrayList<Result> (allResults.subList(0, numOfTimes));
+    }
+
+    public ArrayList<Result> getWorstAverages(int numOfTimes) {
+        ArrayList<Result> allResults = getNonDNFAverages();
+        Collections.sort(allResults);
+
+        if (numOfTimes > allResults.size()) {
+            numOfTimes = allResults.size();
+        }
+        return new ArrayList<Result> (allResults.subList(0, numOfTimes));
+    }
+
     public ArrayList<Result> getTopAverages(int numOfTimes) {
         ArrayList<Result> allResults = getAllAverages();
         Collections.sort(allResults);

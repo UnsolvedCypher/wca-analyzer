@@ -45,7 +45,7 @@ public class StatsViewController {
             competitorName.setText("Stats for " + Main.competitorName + " (" + Main.WCAID + ")");
             setTables();
             for (Event event : Main.events) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("EventTab.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("EventsTabWithGraphs.fxml"));
                 loader.load();
                 EventTabController eventTabController = loader.getController();
                 tabPane.getTabs().add(eventTabController.getTab(event));

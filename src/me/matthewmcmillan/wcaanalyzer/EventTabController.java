@@ -34,7 +34,7 @@ public class EventTabController {
     TableColumn<Result, String> singleTimeCol, singleCompCol, countingTimeCol, countingCompCol, averageTimeCol, averageCompCol;
 
     @FXML
-    AnchorPane graphParent;
+    HBox graphParent;
 
     public Tab getTab(Event event) {
         tab.setText(event.getName());
@@ -42,9 +42,9 @@ public class EventTabController {
         countingTimeCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().toString()));
         averageTimeCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().toString()));
 
-        singleCompCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getComp()));
-        countingCompCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getComp()));
-        averageCompCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getComp()));
+        singleCompCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getComp().getName()));
+        countingCompCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getComp().getName()));
+        averageCompCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getComp().getName()));
 
         ObservableList<Result> topSingles = FXCollections.observableArrayList(event.getTopSingles(NUM_RESULTS));
         ObservableList<Result> topCountingSingles = FXCollections.observableArrayList(event.getTopCountingSingles(NUM_RESULTS));
@@ -70,6 +70,9 @@ public class EventTabController {
 
         //initializeChart();
         return tab;
+    }
+
+    private void initializeGraphs(Event event) {
     }
 
     private void initializeChart() {
