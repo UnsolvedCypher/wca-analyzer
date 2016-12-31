@@ -52,7 +52,7 @@ public class Event {
         return nonDNFAverages;
     }
 
-    public int getNumCompletedAverages() {
+    public int getNumAverages() {
         return getAllAverages().size();
     }
 
@@ -84,12 +84,11 @@ public class Event {
                 DNFs++;
             }
         }
-        return (double)DNFs / (double)(DNFs + getSuccessfulSingles().size());
+        return (double)DNFs / (double)(DNFs + getNonDNFSingles().size());
     }
 
     // no DNF or DNS
-    public ArrayList<Result> getSuccessfulSingles() {
-        int DNFs = 0;
+    public ArrayList<Result> getNonDNFSingles() {
         ArrayList<Result> successfulSolves = new ArrayList<>();
         for (Result result : getAllSingles()) {
             if (!result.isDNF() && !result.isDNS()) {
@@ -101,7 +100,7 @@ public class Event {
 
     // percent DNFs out of all completed averages
     public double getAverageDNFRate() {
-        return (double)(getNumCompletedAverages() - getNumNonDNFAverages()) / (double)getNumCompletedAverages();
+        return (double)(getNumAverages() - getNumNonDNFAverages()) / (double) getNumAverages();
     }
 
     public int getNumAttempts() {

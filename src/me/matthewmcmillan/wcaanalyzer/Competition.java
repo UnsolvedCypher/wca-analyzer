@@ -9,11 +9,19 @@ public class Competition implements Comparable<Competition> {
         return name;
     }
 
-    public Competition(String name, LocalDate date) {
+    public Competition(String name, String url) {
         this.name = name;
-        this.date = date;
+        this.url = url;
     }
-    private String name;
+
+    public void calculateDate() {
+        try {
+            this.date = WCAReader.getDateFromCompURL(url);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private String name, url;
     private HashMap<String, Event> events = new HashMap<>();
     private LocalDate date;
     public void addAttemptSequence(String eventName, AttemptSequence sequence) {

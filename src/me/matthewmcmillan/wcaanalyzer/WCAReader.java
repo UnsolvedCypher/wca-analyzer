@@ -1,5 +1,7 @@
 package me.matthewmcmillan.wcaanalyzer;
 
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.concurrent.Task;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -8,6 +10,7 @@ import org.jsoup.select.Elements;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.BiFunction;
 
 public class WCAReader {
     private Document page;
@@ -25,7 +28,7 @@ public class WCAReader {
             boolean ready = false;
             for (Element eventNameElement : page.select("td.caption")) {
                 String name = eventNameElement.text();
-                if (ready && !name.equals("Rubik's Cube: Fewest moves") && !name.contains("Multi")) {
+                if (ready && !name.contains("old style")) {
                     events.put(name, new Event(name));
                 } else if (name.equals("History (Map)")) {
                     ready = true;
@@ -38,60 +41,62 @@ public class WCAReader {
         }
     }
 
-    public void readComps() throws Exception {
-        try {
-            HashMap<String, Competition> comps = new HashMap<>();
-            Element table = null;
-            for (Element data : page.select("tr")) {
-                if (data.text().equals("Rubik's Cube")) {
-                    table = data.parent().parent();
+    public Task<Void> readComps(BiFunction<Double, Double, Void> updateFunction) throws Exception {
+        return new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                HashMap<String, Competition> comps = new HashMap<>();
+                Element table = null;
+                for (Element data : page.select("tr")) {
+                    if (data.text().equals("Rubik's Cube")) {
+                        table = data.parent().parent();
+                    }
                 }
-            }
-            String currentEventName = "";
-            String currentComp = null;
-            boolean ready = false;
-            for (Element row : table.select("tr")) {
-                if (row.select("td").toString().contains("<td colspan=\"8\">")) {
-                    ready = false;
+                String currentEventName = "";
+                String currentComp = null;
+                boolean ready = false;
+                for (Element row : table.select("tr")) {
+                    if (row.select("td").toString().contains("<td colspan=\"8\">")) {
+                        ready = false;
 
-                } else if (row.select("td").hasClass("caption")) {
-                    String eventName = row.select("td").select("a").text();
-                    if(!eventName.equals("Map")) {
-                        currentEventName = eventName;
-                    }
-                } else if (ready && !currentEventName.contains("Multi") && !currentEventName.equals("Rubik's Cube: Fewest moves")) {
-                    Elements data = row.select("td");
-                    String newComp = data.get(0).text();
-                    if (!newComp.equals("" + (char)160)) {
-                        currentComp = newComp;
-                    }
-                    String round = data.get(1).text();
-                    int place = Integer.parseInt(data.get(2).text());
-                    String average = data.get(5).text();
-                    String rawResults = data.get(7).text();
-                    if (comps.get(currentComp) == null) {
-                        String compURL = data.get(0).select("a").get(0).attr("href");
-                        comps.put(currentComp, new Competition(currentComp, getDateFromCompURL(compURL)));
-                    }
-                    if (rawResults.contains("/")) {
-                        System.out.println("mbld is a piece of shit");
-                        System.out.println(currentEventName);
-                    }
-                    comps.get(currentComp).addAttemptSequence(currentEventName, new AttemptSequence(round, currentComp, place, rawResults, average));
-                } else if (!row.select("th").isEmpty()) {
-                    for (Element header : row.select("th")) {
-                        if (header.text().equals("Competition")) {
-                            ready = true;
+                    } else if (row.select("td").hasClass("caption")) {
+                        String eventName = row.select("td").select("a").text();
+                        if(!eventName.equals("Map")) {
+                            currentEventName = eventName;
+                        }
+                    } else if (ready && !currentEventName.contains("old style")) {
+                        Elements data = row.select("td");
+                        String newComp = data.get(0).text();
+                        if (!newComp.equals("" + (char)160)) {
+                            currentComp = newComp;
+                        }
+                        String round = data.get(1).text();
+                        int place = Integer.parseInt(data.get(2).text());
+                        String average = data.get(5).text();
+                        String rawResults = data.get(7).text();
+                        if (comps.get(currentComp) == null) {
+                            String compURL = data.get(0).select("a").get(0).attr("href");
+                            comps.put(currentComp, new Competition(currentComp, compURL));
+                        }
+                        comps.get(currentComp).addAttemptSequence(currentEventName, new AttemptSequence(currentEventName, round, currentComp, place, rawResults, average));
+                    } else if (!row.select("th").isEmpty()) {
+                        for (Element header : row.select("th")) {
+                            if (header.text().equals("Competition")) {
+                                ready = true;
+                            }
                         }
                     }
                 }
+                double totalProgress = comps.size(), currProgress = 0;
+                for (Competition comp : comps.values()) {
+                    comp.calculateDate();
+                    currProgress++;
+                    updateFunction.apply(currProgress, totalProgress);
+                }
+                Main.comps = new ArrayList<>(comps.values());
+                return null;
             }
-            Main.comps = new ArrayList<Competition>(comps.values());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception("Error reading competitions for given WCAID");
-        }
+        };
     }
 
     public String getName() throws Exception {
@@ -104,7 +109,7 @@ public class WCAReader {
 
     public static LocalDate getDateFromCompURL(String URL) throws Exception {
         try {
-            Document page = Jsoup.connect("https://www.worldcubeassociation.org" + URL).timeout(10 * 1000).get();
+            Document page = Jsoup.connect("https://www.worldcubeassociation.org" + URL).timeout(20 * 1000).get();
             String dateString = page.select("div.competition-info").first().select("dd").first().text();
 
             // use only first date from comps that span multiple dates

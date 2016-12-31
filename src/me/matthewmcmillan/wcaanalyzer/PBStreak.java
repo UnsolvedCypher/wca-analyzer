@@ -27,7 +27,7 @@ public class PBStreak implements Comparable<PBStreak> {
     public int length = 1;
 
     public String getEnd() {
-        return (end == null) ? "current" : formatter.format(end);
+        return (end == null) ? "Current" : formatter.format(end);
     }
 
     public int getLength() {

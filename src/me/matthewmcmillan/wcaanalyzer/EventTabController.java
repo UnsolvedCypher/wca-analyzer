@@ -1,12 +1,20 @@
 package me.matthewmcmillan.wcaanalyzer;
 
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.chart.Axis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.ScatterChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+
+import java.util.ArrayList;
+import java.util.TreeMap;
 
 public class EventTabController {
     private static final int NUM_RESULTS = 10;
@@ -24,6 +32,9 @@ public class EventTabController {
 
     @FXML
     TableColumn<Result, String> singleTimeCol, singleCompCol, countingTimeCol, countingCompCol, averageTimeCol, averageCompCol;
+
+    @FXML
+    AnchorPane graphParent;
 
     public Tab getTab(Event event) {
         tab.setText(event.getName());
@@ -47,7 +58,7 @@ public class EventTabController {
         averageDNFLabel.setText("Average DNF Rate: " + WCAReader.asPercent(event.getAverageDNFRate()));
         totalRounds.setText("Rounds Competed in: " + event.getNumRoundsCompetedIn());
         totalAttempts.setText("Total Attempts: " + event.getNumAttempts());
-        singleSuccesses.setText("Single Successes: " + event.getSuccessfulSingles().size());
+        singleSuccesses.setText("Single Successes: " + event.getNonDNFSingles().size());
         averageSuccesses.setText("Average Successes: " + event.getNumNonDNFAverages());
 
         singleDNFBar.setProgress(event.getSingleDNFRate());
@@ -57,6 +68,38 @@ public class EventTabController {
             ((HBox)countingTable.getParent().getParent()).getChildren().remove(1);
         }
 
+        //initializeChart();
         return tab;
+    }
+
+    private void initializeChart() {
+
+        TreeMap<Integer, Integer> yearsAndComps = WCAReader.getYearTreeMap(Main.comps);
+        Integer minYear = new ArrayList<Integer>(yearsAndComps.keySet()).get(0);
+        Integer maxYear = new ArrayList<Integer>(yearsAndComps.keySet()).get(yearsAndComps.size() - 1);
+        Integer maxComps = 0;
+        for (Integer comps : yearsAndComps.values()) {
+            if (comps > maxComps) {
+                maxComps = comps;
+            }
+        }
+
+        NumberAxis yearsAndCompsX = new NumberAxis(minYear, maxYear, 1);
+        NumberAxis yearsAndCompsY = new NumberAxis(0, maxComps, 5);
+
+        ScatterChart graph = new ScatterChart<Number, Number>(yearsAndCompsX, yearsAndCompsY);
+
+        graphParent.getChildren().add(graph);
+
+        XYChart.Series yearsAndCompsSeries = new XYChart.Series();
+        for (Integer year : yearsAndComps.keySet()) {
+            yearsAndCompsSeries.getData().add(new XYChart.Data(year, yearsAndComps.get(year)));
+        }
+
+//        graph.getXAxis().setAutoRanging(true);
+//        graph.getYAxis().setAutoRanging(true);
+
+        graph.getData().addAll(yearsAndCompsSeries);
+        graph.setTitle("hi");
     }
 }

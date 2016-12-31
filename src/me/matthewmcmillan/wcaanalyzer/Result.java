@@ -1,91 +1,18 @@
 package me.matthewmcmillan.wcaanalyzer;
 
-public class Result implements Comparable<Result>{
-    public Result(String resultString, String comp, String round) {
-        if (resultString.equals("DNF")) {
-            DNF = true;
-        } else if (resultString.equals("DNS")) {
-            DNS = true;
-        } else if (resultString.contains(":")) {
-            minutes = Integer.parseInt(resultString.split(":")[0]);
-            seconds = Integer.parseInt(resultString.split(":")[1].split("\\.")[0]);
-            nanoSeconds = Integer.parseInt(resultString.split(":")[1].split("\\.")[1]);
-        } else {
-            minutes = 0;
-            seconds = Integer.parseInt(resultString.split("\\.")[0]);
-            nanoSeconds = Integer.parseInt(resultString.split("\\.")[1]);
-        }
-        this.comp = comp;
-        this.round = round;
-    }
-    private String round, comp;
+public interface Result extends Comparable<Result> {
 
-    public String getRound() {
-        return round;
-    }
+    String getRound();
 
-    public String getComp() {
-        return comp;
-    }
-    /*
-    public Result(int nanoSeconds) {
-        this.nanoSeconds = nanoSeconds % 100;
-        this.seconds = (nanoSeconds / 100) % 60;
-        this.minutes = (nanoSeconds / 100) / 60;
-    }*/
-
-    public int toNanoSeconds() {
-        return nanoSeconds + seconds * 100 + minutes * 6000;
-    }
+    String getComp();
 
     @Override
-    public String toString() {
-        if (DNF) {
-            return "DNF";
-        } else if (DNS) {
-            return "DNS";
-        } else {
-            String minutesString = (minutes == 0) ? "" : minutes + ":";
-            String secondsString = (minutes != 0 && seconds < 10) ? "0" + seconds : "" + seconds;
-            secondsString = (secondsString.equals("0")) ? "00" : secondsString;
-            String nanoString = (nanoSeconds < 10) ? ".0" + nanoSeconds : "." + nanoSeconds;
-            return minutesString + secondsString + nanoString;
-        }
-    }
-
-    public String toStringWithCompAndRound() {
-        return toString() + " at " + comp + " (" + round + " round)";
-    }
-
-    private int minutes;
-    private int seconds;
-    private int nanoSeconds;
-    private boolean DNF = false, DNS = false;
+    int compareTo(Result other);
 
     @Override
-    public int compareTo(Result other) {
-        if (other == null) {
-            return -1;
-        }else if ((DNF || DNS) && !(other.DNF || other.DNS)) {
-            return 1;
-        } else if (!(DNF || DNS) && (other.DNF || other.DNS)) {
-            return -1;
-        } else if ((DNS && other.DNS) || (DNF && other.DNF)) {
-            return 0;
-        } else if (DNS && other.DNF) {
-            return 1;
-        } else if (DNF && other.DNS) {
-            return -1;
-        } else {
-            return new Integer(this.toNanoSeconds()).compareTo(new Integer (other.toNanoSeconds()));
-        }
-    }
+    String toString();
 
-    public boolean isDNF() {
-        return DNF;
-    }
+    boolean isDNF();
 
-    public boolean isDNS() {
-        return DNS;
-    }
+    boolean isDNS();
 }
