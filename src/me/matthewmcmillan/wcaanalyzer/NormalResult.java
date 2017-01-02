@@ -46,7 +46,7 @@ public class NormalResult extends Result {
             public String toString(Number object) {
                 Double asDouble = (Double)object;
                 int minutes = (int)Math.floor(asDouble / 60);
-                int seconds = (int)Math.floor(asDouble % 100);
+                int seconds = (int)Math.floor(asDouble % 60);
                 int centiseconds = (int)Math.floor(asDouble * 100 % 100);
                 String minutesString = (minutes == 0) ? "" : minutes + ":";
                 String secondsString = (minutes != 0 && seconds < 10) ? "0" + seconds : "" + seconds;
@@ -68,7 +68,7 @@ public class NormalResult extends Result {
             public String toString(Double object) {
                 Double asDouble = object;
                 int minutes = (int)Math.floor(asDouble / 60);
-                int seconds = (int)Math.floor(asDouble % 100);
+                int seconds = (int)Math.floor(asDouble % 60);
                 int centiseconds = (int)Math.floor(asDouble * 100 % 100);
                 String minutesString = (minutes == 0) ? "" : minutes + ":";
                 String secondsString = (minutes != 0 && seconds < 10) ? "0" + seconds : "" + seconds;
