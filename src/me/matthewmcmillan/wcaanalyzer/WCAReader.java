@@ -93,7 +93,8 @@ public class WCAReader {
                     currProgress++;
                     updateFunction.apply(currProgress, totalProgress);
                 }
-                Main.comps = new ArrayList<>(comps.values());
+                Main.comps = new ArrayList<Competition>(comps.values());
+                Collections.sort(Main.comps);
                 return null;
             }
         };

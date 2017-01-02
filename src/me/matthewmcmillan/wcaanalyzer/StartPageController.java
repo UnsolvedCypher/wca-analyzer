@@ -66,11 +66,11 @@ public class StartPageController {
 
     public void getStats() {
         progressIndicator.setVisible(true);
+        progressBar.setProgress(-1);
         loadingMsg.setVisible(true);
         Task<Void> readData = new Task<Void>() {
             @Override
             protected Void call()  throws Exception{
-                updateProgress(0, 1);
                 WCAReader reader = new WCAReader(idField.getText());
                 Main.WCAID = idField.getText().toUpperCase();
                 Main.competitorName = reader.getName();

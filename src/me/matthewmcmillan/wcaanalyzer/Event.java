@@ -69,6 +69,7 @@ public class Event {
     public ArrayList<Result> getWorstSingles(int numOfTimes) {
         ArrayList<Result> allResults = getNonDNFSingles();
         Collections.sort(allResults);
+        Collections.reverse(allResults);
 
         if (numOfTimes > allResults.size()) {
             numOfTimes = allResults.size();
@@ -79,6 +80,7 @@ public class Event {
     public ArrayList<Result> getWorstAverages(int numOfTimes) {
         ArrayList<Result> allResults = getNonDNFAverages();
         Collections.sort(allResults);
+        Collections.reverse(allResults);
 
         if (numOfTimes > allResults.size()) {
             numOfTimes = allResults.size();

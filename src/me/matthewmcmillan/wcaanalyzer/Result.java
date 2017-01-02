@@ -1,6 +1,12 @@
 package me.matthewmcmillan.wcaanalyzer;
 
+import javafx.util.StringConverter;
+
 public abstract class Result implements Comparable<Result> {
+    String round;
+    Competition comp;
+    boolean DNF = false, DNS = false;
+
     public Result(String resultString, Competition comp, String round) {
         this.comp = comp;
         this.round = round;
@@ -13,11 +19,18 @@ public abstract class Result implements Comparable<Result> {
             customParseResultString(resultString);
         }
     }
-    String round;
+
+    abstract double toGraphableValue();
+
+    public Double getGraphableValue() {
+        if (DNF || DNS) {
+            return null;
+        } else {
+            return this.toGraphableValue();
+        }
+    }
 
     abstract void customParseResultString(String resultString);
-
-    Competition comp;
 
     public String getRound() {
         return round;
@@ -26,8 +39,6 @@ public abstract class Result implements Comparable<Result> {
     public Competition getComp() {
         return comp;
     }
-
-    boolean DNF = false, DNS = false;
 
     abstract int customCompareTo(Result other);
 

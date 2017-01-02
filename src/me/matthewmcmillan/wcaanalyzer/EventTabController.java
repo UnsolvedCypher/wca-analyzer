@@ -1,20 +1,20 @@
 package me.matthewmcmillan.wcaanalyzer;
 
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.chart.Axis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.ScatterChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
-import java.util.TreeMap;
 
 public class EventTabController {
     private static final int NUM_RESULTS = 10;
@@ -35,6 +35,17 @@ public class EventTabController {
 
     @FXML
     HBox graphParent;
+
+    @FXML
+    VBox statsContent, graphsContent;
+
+    @FXML
+    ToggleButton statsButton1, statsButton2, graphsButton1, graphsButton2;
+
+    @FXML
+    Slider startYear, endYear, startResult, endResult;
+
+    private NumberAxis singleDateAxis, averageDateAxis, singleAxis, averageAxis;
 
     public Tab getTab(Event event) {
         tab.setText(event.getName());
@@ -64,45 +75,148 @@ public class EventTabController {
         singleDNFBar.setProgress(event.getSingleDNFRate());
         averageDNFBar.setProgress(event.getAverageDNFRate());
 
-        if (event.getName().contains("Blindfolded") || event.getName().contains("6x6") || event.getName().contains("7x7")) {
+        if (event.getName().contains("Blind") || event.getName().contains("6x6") || event.getName().contains("7x7")) {
             ((HBox)countingTable.getParent().getParent()).getChildren().remove(1);
         }
 
         //initializeChart();
+        initializeGraphs(event);
+        initializeSliders(event);
+        switchToStats();
         return tab;
     }
 
     private void initializeGraphs(Event event) {
+
+
+        if (!event.getName().contains("Multi")) {
+            maxResult = event.getWorstSingles(1).size() > 0 ? event.getWorstSingles(1).get(0).toGraphableValue() : 0;
+        } else {
+            maxResult = event.getTopSingles(1).size() > 0 ? event.getTopSingles(1).get(0).toGraphableValue() : 0;
+        }
+
+        maxResult = Math.ceil(maxResult);
+
+        XYChart.Series<Long, Double> singles = new XYChart.Series<>();
+        XYChart.Series<Long, Double> averages = new XYChart.Series<>();
+
+        for (Result single : event.getNonDNFSingles()) {
+            singles.getData().addAll(new XYChart.Data<>(single.getComp().getDate().toEpochDay(), single.getGraphableValue()));
+        }
+
+        for (Result average : event.getNonDNFAverages()) {
+            averages.getData().addAll(new XYChart.Data<>(average.getComp().getDate().toEpochDay(), average.getGraphableValue()));
+        }
+
+        singleDateAxis = new NumberAxis(minDate, maxDate, 365.25);
+        averageDateAxis = new NumberAxis(minDate, maxDate, 365.25);
+        singleAxis = new NumberAxis(0, Math.ceil(maxResult), Math.ceil(maxResult / 10));
+        averageAxis = new NumberAxis(0, Math.ceil(maxResult), Math.ceil(maxResult / 10));
+
+        if (!event.getName().contains("Multi") && !event.getName().equals("3x3x3 Fewest Moves")) {
+            singleAxis.setTickLabelFormatter(NormalResult.getStringConverter());
+            averageAxis.setTickLabelFormatter(NormalResult.getStringConverter());
+        }
+
+
+        singleDateAxis.setTickLabelFormatter(Main.dateStringConverter);
+        averageDateAxis.setTickLabelFormatter(Main.dateStringConverter);
+
+        ScatterChart singleGraph = new ScatterChart(singleDateAxis, singleAxis);
+        ScatterChart averageGraph = new ScatterChart(averageDateAxis, averageAxis);
+
+        singleGraph.setLegendVisible(false);
+        averageGraph.setLegendVisible(false);
+
+        singleGraph.setTitle("Singles");
+        averageGraph.setTitle("Averages");
+
+        HBox.setHgrow(singleGraph, Priority.ALWAYS);
+        HBox.setHgrow(averageGraph, Priority.ALWAYS);
+
+
+        singleGraph.getData().addAll(singles);
+        // adding an empty series so that the chart changes color
+        averageGraph.getData().add(new XYChart.Series<>());
+        averageGraph.getData().add(new XYChart.Series<>());
+        averageGraph.getData().addAll(averages);
+
+        graphParent.getChildren().add(singleGraph);
+        graphParent.getChildren().add(averageGraph);
+
+
     }
 
-    private void initializeChart() {
+    private double maxResult;
 
-        TreeMap<Integer, Integer> yearsAndComps = WCAReader.getYearTreeMap(Main.comps);
-        Integer minYear = new ArrayList<Integer>(yearsAndComps.keySet()).get(0);
-        Integer maxYear = new ArrayList<Integer>(yearsAndComps.keySet()).get(yearsAndComps.size() - 1);
-        Integer maxComps = 0;
-        for (Integer comps : yearsAndComps.values()) {
-            if (comps > maxComps) {
-                maxComps = comps;
-            }
+    private double minDate = LocalDate.of(Main.comps.get(0).getDate().getYear(), Month.JANUARY, 1).toEpochDay();
+    private double maxDate = LocalDate.of(Main.comps.get(Main.comps.size() - 1).getDate().getYear() + 1, Month.JANUARY, 1).toEpochDay();
+
+    public void initializeSliders(Event event) {
+        startYear.setLabelFormatter(Main.doubleDateStringConverter);
+        endYear.setLabelFormatter(Main.doubleDateStringConverter);
+        if (!event.getName().contains("Multi") && !event.getName().equals("3x3x3 Fewest Moves")) {
+            startResult.setLabelFormatter(NormalResult.getDoubleStringConverter());
+            endResult.setLabelFormatter(NormalResult.getDoubleStringConverter());
         }
 
-        NumberAxis yearsAndCompsX = new NumberAxis(minYear, maxYear, 1);
-        NumberAxis yearsAndCompsY = new NumberAxis(0, maxComps, 5);
+        startYear.setMin(minDate);
+        startYear.setMax(maxDate);
+        startYear.setMajorTickUnit(365.25);
+        startYear.setValue(minDate);
+        endYear.setMin(minDate);
+        endYear.setMax(maxDate);
+        endYear.setMajorTickUnit(365.25);
+        endYear.setValue(maxDate);
+        double majorTickUnit = Math.ceil(maxResult / 4) == 0 ? 1 : Math.ceil(maxResult / 4);
+        startResult.setMajorTickUnit(majorTickUnit);
+        startResult.setMinorTickCount((int)majorTickUnit - 1);
+        startResult.setMin(0);
+        startResult.setMax(maxResult);
+        startResult.setValue(0);
+        endResult.setMajorTickUnit(majorTickUnit);
+        endResult.setMinorTickCount((int)majorTickUnit - 1);
+        endResult.setMin(0);
+        endResult.setMax(maxResult);
+        endResult.setValue(maxResult);
 
-        ScatterChart graph = new ScatterChart<Number, Number>(yearsAndCompsX, yearsAndCompsY);
+        setListener(startResult);
+        setListener(endResult);
+        setListener(startYear);
+        setListener(endYear);
+    }
+    public void updateGraphs() {
+        singleAxis.setLowerBound(startResult.getValue());
+        averageAxis.setLowerBound(startResult.getValue());
+        singleAxis.setUpperBound(endResult.getValue());
+        averageAxis.setUpperBound(endResult.getValue());
+        singleAxis.setTickUnit(Math.round((endResult.getValue() - startResult.getValue()) / 10));
+        averageAxis.setTickUnit(Math.round((endResult.getValue() - startResult.getValue()) / 10));
 
-        graphParent.getChildren().add(graph);
+        singleDateAxis.setLowerBound(startYear.getValue());
+        averageDateAxis.setLowerBound(startYear.getValue());
+        singleDateAxis.setUpperBound(endYear.getValue());
+        averageDateAxis.setUpperBound(endYear.getValue());
+        singleDateAxis.setTickUnit(365.25);
+        averageDateAxis.setTickUnit(365.25);
+    }
 
-        XYChart.Series yearsAndCompsSeries = new XYChart.Series();
-        for (Integer year : yearsAndComps.keySet()) {
-            yearsAndCompsSeries.getData().add(new XYChart.Data(year, yearsAndComps.get(year)));
-        }
+    private void setListener (Slider slider) {
+        slider.valueProperty().addListener(e -> updateGraphs());
+    }
 
-//        graph.getXAxis().setAutoRanging(true);
-//        graph.getYAxis().setAutoRanging(true);
 
-        graph.getData().addAll(yearsAndCompsSeries);
-        graph.setTitle("hi");
+    public void switchToStats() {
+        tab.setContent(statsContent);
+        statsButton2.setSelected(false);
+        graphsButton2.setSelected(true);
+        statsButton1.requestFocus();
+    }
+
+    public void switchToGraphs() {
+        tab.setContent(graphsContent);
+        statsButton1.setSelected(true);
+        graphsButton2.requestFocus();
+        graphsButton1.setSelected(false);
     }
 }

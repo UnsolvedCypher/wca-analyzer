@@ -22,6 +22,11 @@ public class FMCResult extends Result {
     }
 
     @Override
+    double toGraphableValue() {
+        return moves;
+    }
+
+    @Override
     public int customCompareTo(Result other) {
         return new Double(this.moves).compareTo(new Double(((FMCResult)other).moves));
     }

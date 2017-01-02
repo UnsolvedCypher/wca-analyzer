@@ -21,6 +21,10 @@ public class MultiResult extends Result{
         return solved + "/" + total + " " + minutes + ":" + seconds;
     }
 
+    double toGraphableValue() {
+        return points;
+    }
+
     private int minutes, seconds, solved, total, points;
 
     private int toSeconds() {
@@ -29,10 +33,11 @@ public class MultiResult extends Result{
 
     int customCompareTo(Result other) {
         MultiResult asMulti = (MultiResult) other;
-        if (this.points != asMulti.points) {
+        if (this.points == asMulti.points) {
             return new Integer(this.toSeconds()).compareTo(new Integer(asMulti.toSeconds()));
         } else {
-            return new Integer(this.points).compareTo(asMulti.points);
+            // negative because more points is better
+            return -(new Integer(this.points).compareTo(asMulti.points));
         }
     }
 }
