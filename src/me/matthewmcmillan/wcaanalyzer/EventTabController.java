@@ -37,10 +37,10 @@ public class EventTabController {
     HBox graphParent;
 
     @FXML
-    VBox statsContent, graphsContent;
+    VBox statsContent, graphsContent, tabContent;
 
     @FXML
-    ToggleButton statsButton1, statsButton2, graphsButton1, graphsButton2;
+    ToggleButton graphsButton, statsButton;
 
     @FXML
     Slider startYear, endYear, startResult, endResult;
@@ -48,6 +48,9 @@ public class EventTabController {
     private NumberAxis singleDateAxis, averageDateAxis, singleAxis, averageAxis;
 
     public Tab getTab(Event event) {
+        ToggleGroup toggleGroup = new ToggleGroup();
+        statsButton.setToggleGroup(toggleGroup);
+        graphsButton.setToggleGroup(toggleGroup);
         tab.setText(event.getName());
         singleTimeCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().toString()));
         countingTimeCol.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().toString()));
@@ -207,16 +210,17 @@ public class EventTabController {
 
 
     public void switchToStats() {
-        tab.setContent(statsContent);
-        statsButton2.setSelected(false);
-        graphsButton2.setSelected(true);
-        statsButton1.requestFocus();
+        statsButton.setSelected(true);
+        tabContent.getChildren().set(1, statsContent);
+        VBox.setVgrow(tabContent.getChildren().get(1), Priority.ALWAYS);
     }
 
     public void switchToGraphs() {
-        tab.setContent(graphsContent);
-        statsButton1.setSelected(true);
-        graphsButton2.requestFocus();
-        graphsButton1.setSelected(false);
+        graphsButton.setSelected(true);
+        tabContent.getChildren().set(1, graphsContent);
+        VBox.setVgrow(tabContent.getChildren().get(1), Priority.ALWAYS);
+    }
+    public void initialize() {
+
     }
 }

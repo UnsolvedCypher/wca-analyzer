@@ -9,10 +9,16 @@ public class NormalResult extends Result {
 
     @Override
     void customParseResultString(String resultString) {
-        minutes = resultString.contains(":") ? Integer.parseInt(resultString.split(":")[0]) : 0;
-        resultString = resultString.substring(resultString.indexOf(":") + 1);
-        seconds = Integer.parseInt(resultString.split("\\.")[0]);
-        centiseconds = Integer.parseInt(resultString.split("\\.")[1]);
+        try {
+            minutes = resultString.contains(":") ? Integer.parseInt(resultString.split(":")[0]) : 0;
+            resultString = resultString.substring(resultString.indexOf(":") + 1);
+            seconds = Integer.parseInt(resultString.split("\\.")[0]);
+            centiseconds = Integer.parseInt(resultString.split("\\.")[1]);
+        } catch (Exception e) {
+            System.out.println("exception with the following input string: ");
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
     private double toSeconds() {

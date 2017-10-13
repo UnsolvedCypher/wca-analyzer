@@ -1,8 +1,6 @@
 package me.matthewmcmillan.wcaanalyzer;
 
 import javafx.application.Application;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ObservableIntegerValue;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Parent;
@@ -24,7 +22,7 @@ public class Main extends Application {
     public static Scene mainScene;
     public static Parent mainParent;
     public static Stage mainStage;
-    public static final String VERSION = "2.1";
+    public static final String VERSION = "2.2";
     public static StartPageController mainController;
 
     @Override

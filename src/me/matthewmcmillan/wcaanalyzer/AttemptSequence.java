@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class AttemptSequence {
-    public AttemptSequence(String eventName, String round, Competition comp, int place, String rawResults, String average) {
+    public AttemptSequence(String eventName, String round, Competition comp, int place, ArrayList<String> rawResults, String average) {
         this.round = round;
         this.comp = comp;
         this.place = place;
         this.eventName = eventName;
         this.results = parseRawResults(rawResults, comp, round);
-        if (!average.equals(" ")) {
+        if (!average.equals("")) {
             this.average = new NormalResult(average, comp, round);
         }
     }
@@ -45,9 +45,9 @@ public class AttemptSequence {
         return average;
     }
 
-    private ArrayList<Result> parseRawResults(String rawResults, Competition comp, String round) {
+    private ArrayList<Result> parseRawResults(ArrayList<String> rawResults, Competition comp, String round) {
         ArrayList<Result> parsedResults = new ArrayList<>();
-        for (String result : rawResults.split(" " + (char)160 + " ")) {
+        for (String result : rawResults) {
             if (eventName.equals("3x3x3 Fewest Moves")) {
                 parsedResults.add(new FMCResult(result, comp, round));
             } else if (eventName.equals("3x3x3 Multi-Blind")) {
