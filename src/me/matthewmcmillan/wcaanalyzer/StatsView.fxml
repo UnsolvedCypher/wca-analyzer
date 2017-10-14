@@ -10,10 +10,11 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.matthewmcmillan.wcaanalyzer.StatsViewController">
+<VBox fx:id="mainBox" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" spacing="10.0" xmlns="http://javafx.com/javafx/8.0.102" xmlns:fx="http://javafx.com/fxml/1" fx:controller="me.matthewmcmillan.wcaanalyzer.StatsViewController">
    <children>
       <Label fx:id="competitorName" text="Statistics for Competitor (ID)">
          <font>
@@ -100,7 +101,7 @@
       </TabPane>
       <HBox alignment="CENTER" spacing="100.0">
          <children>
-            <Label text="Program by Matthew McMillan" />
+            <Label prefHeight="200.0" text="Program by Matthew McMillan" HBox.hgrow="NEVER" />
             <Label fx:id="version" text="Version 1.4" />
             <Label text="matthewmcmillan.me/wca-analyzer" />
          </children>
@@ -108,6 +109,24 @@
             <Insets bottom="32.0" top="40.0" />
          </padding>
       </HBox>
+      <VBox fx:id="bottomStats" alignment="CENTER" spacing="10.0">
+         <children>
+            <HBox alignment="CENTER" fillHeight="false" maxWidth="1.7976931348623157E308" prefHeight="100.0" spacing="100.0">
+               <children>
+                  <Label fx:id="totalComps" text="Number of competitions: 100" />
+                  <Label fx:id="totalPbs" text="Number of personal bests: 100" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" fillHeight="false" maxWidth="1.7976931348623157E308" prefHeight="100.0" spacing="100.0">
+               <children>
+                  <Label fx:id="totalAttempts" text="Total Attempts: 100" />
+                  <Label fx:id="successfulSingles" text="Single Successes: 100" />
+                  <Label fx:id="successfulAverages" text="Average Successes: 100" />
+               </children>
+            </HBox>
+            <Region maxHeight="1.7976931348623157E308" prefHeight="1000.0" />
+         </children>
+      </VBox>
    </children>
    <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

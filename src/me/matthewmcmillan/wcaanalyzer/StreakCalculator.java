@@ -5,9 +5,9 @@ import java.util.Collections;
 import java.util.HashMap;
 
 public class StreakCalculator {
-    private ArrayList<Competition> unorderedComps;
-    public StreakCalculator(ArrayList<Competition> unorderedComps) {
-        this.unorderedComps = unorderedComps;
+    private ArrayList<Competition> competitions;
+    public StreakCalculator(ArrayList<Competition> competitions) {
+        this.competitions = competitions;
     }
 
     public ArrayList<PBStreak> getBestStreaks(int numToGet, boolean excludeFMC) {
@@ -30,29 +30,49 @@ public class StreakCalculator {
         }
     }
 
+    // set pbs for all events and competitions
+    public static void calculatePbs() {
+        for (Event event : Main.events.values()) {
+            Result bestSingle = null;
+            Result bestAverage = null;
+            //System.out.println("There are " + event.getAttemptSequences().size() + " attempt sequences in " + event.getName());
+            for (AttemptSequence sequence : event.getAttemptSequences()) {
+                // there will never be a null single
+                if (bestSingle == null) {
+                    bestSingle = sequence.getSingle();
+                    sequence.getSingle().setPbIfCompleted();
+                } else {
+                    if (bestSingle.compareTo(sequence.getSingle()) >= 0) {
+                        bestSingle = sequence.getSingle();
+                        sequence.getSingle().setPbIfCompleted();
+                    }
+                }
+                // there could be a null average if the person didn't make the cutoff
+                if (bestAverage == null && sequence.getAverage() != null) {
+                    bestAverage = sequence.getAverage();
+                    sequence.getAverage().setPbIfCompleted();
+                } else if (sequence.getAverage() != null) {
+                    if (bestAverage.compareTo(sequence.getAverage()) >= 0) {
+                        bestAverage = sequence.getAverage();
+                        sequence.getAverage().setPbIfCompleted();
+                    }
+                }
+
+            }
+
+        }
+
+    }
+
     public ArrayList<PBStreak> getStreaksInOrder(boolean excludeFMC) {
-        // not touching comps so the original arraylist isn't modified
-        ArrayList<Competition> compsInOrder = new ArrayList<>(unorderedComps);
-        // put comps in chronological order
-        Collections.sort(compsInOrder);
         HashMap<String, Result> singlePBs = new HashMap<>();
         HashMap<String, Result> averagePBs = new HashMap<>();
         ArrayList<PBStreak> streaks = new ArrayList<>();
         boolean streakGoing = false;
-        for (Competition comp : compsInOrder) {
+        for (Competition comp : competitions) {
             if (!excludeFMC || (excludeFMC && !(comp.getEvents().size() == 1 && comp.getEvents().get(0).getName().equals("3x3x3 Fewest Moves")))) {
-                boolean pbBroken = false;
-                for (Event event : comp.getEvents()) {
-                    if (event.getNonDNFSingles().size() > 0 && event.getTopSingles(1).get(0).compareTo(singlePBs.get(event.getName())) <= 0) {
-                        singlePBs.put(event.getName(), event.getTopSingles(1).get(0));
-                        pbBroken = true;
-                    }
-                    if (event.getNonDNFAverages().size() > 0 && event.getTopAverages(1).get(0).compareTo(averagePBs.get(event.getName())) <= 0) {
-                        averagePBs.put(event.getName(), event.getTopAverages(1).get(0));
-                        pbBroken = true;
-                    }
-                }
-                if (pbBroken) {
+                // if a pb is broken at the comp
+                if (comp.getPbs() > 0) {
                     if (streakGoing) {
                         streaks.get(streaks.size() - 1).increment();
                     } else {

@@ -8,10 +8,25 @@ public class Event {
     public Event(String name) {
         this.name = name;
     }
+    private int personalBests = 0;
+    public void incrementPbsBy(int i) {
+        personalBests += i;
+    }
+    public int getPbs() {
+        return personalBests;
+    }
+
     private ArrayList<AttemptSequence> attemptSequences = new ArrayList<>();
     public void addAttemptSequence(AttemptSequence attemptSequence) {
+        // attempt sequences are added in reverse, since newest ones are listed first online
         this.attemptSequences.add(attemptSequence);
     }
+
+    public void addReverseAttemptSequence(AttemptSequence attemptSequence) {
+        // attempt sequences are added in reverse, since newest ones are listed first online
+        this.attemptSequences.add(0, attemptSequence);
+    }
+
     public int getNumRoundsCompetedIn() {
         return attemptSequences.size();
     }

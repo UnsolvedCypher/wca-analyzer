@@ -3,8 +3,8 @@ package me.matthewmcmillan.wcaanalyzer;
 import javafx.util.StringConverter;
 
 public class NormalResult extends Result {
-    public NormalResult(String resultString, Competition comp, String round) {
-        super(resultString, comp, round);
+    public NormalResult(String resultString, Competition comp, Event event, String round) {
+        super(resultString, comp, event, round);
     }
 
     @Override
@@ -16,7 +16,8 @@ public class NormalResult extends Result {
             centiseconds = Integer.parseInt(resultString.split("\\.")[1]);
         } catch (Exception e) {
             System.out.println("exception with the following input string: ");
-            e.printStackTrace();
+            System.out.println("During " + event.getName() + " at " + comp.getName());
+            //e.printStackTrace();
             System.exit(1);
         }
     }
@@ -63,7 +64,7 @@ public class NormalResult extends Result {
 
             @Override
             public Double fromString(String string) {
-                return new NormalResult(string, null, null).toGraphableValue();
+                return new NormalResult(string, null, null, null).toGraphableValue();
             }
         };
     }
@@ -85,7 +86,7 @@ public class NormalResult extends Result {
 
             @Override
             public Double fromString(String string) {
-                return new NormalResult(string, null, null).toGraphableValue();
+                return new NormalResult(string, null, null, null).toGraphableValue();
             }
         };
     }

@@ -4,18 +4,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class AttemptSequence {
-    public AttemptSequence(String eventName, String round, Competition comp, int place, ArrayList<String> rawResults, String average) {
+    public AttemptSequence(String round, Competition comp, Event event, int place, ArrayList<String> rawResults, String average) {
         this.round = round;
         this.comp = comp;
         this.place = place;
-        this.eventName = eventName;
-        this.results = parseRawResults(rawResults, comp, round);
+        this.results = parseRawResults(rawResults, comp, event, round);
+        // if there's no average, average will be null
         if (!average.equals("")) {
-            this.average = new NormalResult(average, comp, round);
+            this.average = new NormalResult(average, comp, event, round);
         }
     }
 
-    private String round, eventName;
+    private String round;
     private Competition comp;
     private int place;
     Result average;
@@ -41,21 +41,36 @@ public class AttemptSequence {
         }
     }
 
+    public Result getSingle() {
+        ArrayList<Result> sortedResults = new ArrayList<Result>(results);
+        Collections.sort(sortedResults);
+        return sortedResults.get(0);
+    }
+
     public Result getAverage() {
         return average;
     }
 
-    private ArrayList<Result> parseRawResults(ArrayList<String> rawResults, Competition comp, String round) {
+    private ArrayList<Result> parseRawResults(ArrayList<String> rawResults, Competition comp, Event event, String round) {
         ArrayList<Result> parsedResults = new ArrayList<>();
         for (String result : rawResults) {
-            if (eventName.equals("3x3x3 Fewest Moves")) {
-                parsedResults.add(new FMCResult(result, comp, round));
-            } else if (eventName.equals("3x3x3 Multi-Blind")) {
-                parsedResults.add(new MultiResult(result, comp, round));
+            if (event.getName().equals("3x3x3 Fewest Moves")) {
+                parsedResults.add(new FMCResult(result, comp, event, round));
+            } else if (event.getName().equals("3x3x3 Multi-Blind")) {
+                parsedResults.add(new MultiResult(result, comp, event, round));
             } else {
-                parsedResults.add(new NormalResult(result, comp, round));
+                parsedResults.add(new NormalResult(result, comp, event, round));
             }
         }
         return parsedResults;
+    }
+
+    @Override
+    public String toString() {
+        String str = "";
+        for (Result result : results) {
+            str += result.toString() + " ";
+        }
+        return str;
     }
 }

@@ -1,8 +1,8 @@
 package me.matthewmcmillan.wcaanalyzer;
 
 public class FMCResult extends Result {
-    public FMCResult(String resultString, Competition comp, String round) {
-        super(resultString, comp, round);
+    public FMCResult(String resultString, Competition comp, Event event, String round) {
+        super(resultString, comp, event, round);
     }
 
     @Override

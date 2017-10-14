@@ -27,6 +27,9 @@ public class StatsViewController {
     TabPane tabPane;
 
     @FXML
+    VBox mainBox;
+
+    @FXML
     VBox statsContent, graphsContent, tabContent;
 
     @FXML
@@ -57,6 +60,12 @@ public class StatsViewController {
     CheckBox excludeFMCCheck;
 
     @FXML
+    Label totalAttempts, successfulSingles, successfulAverages, totalComps, totalPbs;
+
+    @FXML
+    VBox bottomStats;
+
+    @FXML
     public void initialize() {
         try {
             ToggleGroup toggleGroup = new ToggleGroup();
@@ -65,7 +74,7 @@ public class StatsViewController {
             version.setText("Version " + Main.VERSION);
             competitorName.setText("Stats for " + Main.competitorName + " (" + Main.WCAID + ")");
             setTables();
-            for (Event event : Main.events) {
+            for (Event event : Main.events.values()) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("EventsTabWithGraphs.fxml"));
                 loader.load();
                 EventTabController eventTabController = loader.getController();
@@ -75,6 +84,7 @@ public class StatsViewController {
             tabPane.getTabs().remove(1);
             initializeChart();
             switchToStats();
+            setBottomStatistics();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,6 +94,22 @@ public class StatsViewController {
     ObservableList<PBStreak> streaksNoFMC = FXCollections.observableArrayList();
 
 
+    private void setBottomStatistics() {
+        int totalAttemptsInt = 0, successfulSinglesInt = 0, successfulAveragesInt = 0,
+                totalCompsInt = Main.comps.size(), totalPbsInt = 0;
+        for (Event event : Main.events.values()) {
+            totalAttemptsInt += event.getNumAttempts();
+            successfulSinglesInt += event.getNonDNFSingles().size();
+            successfulAveragesInt += event.getNumNonDNFAverages();
+            totalPbsInt += event.getPbs();
+        }
+        totalAttempts.setText("Total attempts: " + totalAttemptsInt);
+        successfulSingles.setText("Single successes: " + successfulSinglesInt);
+        successfulAverages.setText("Average successes: " + successfulAveragesInt);
+        totalComps.setText("Number of competitions: " + totalCompsInt);
+        totalPbs.setText("Number of personal bests: " + totalPbsInt);
+        mainBox.getChildren().remove(bottomStats);
+    }
 
     private void setTables() {
 
@@ -179,13 +205,21 @@ public class StatsViewController {
 
     public void switchToStats() {
         statsButton.setSelected(true);
-        tabContent.getChildren().set(1, statsContent);
-        VBox.setVgrow(tabContent.getChildren().get(1), Priority.ALWAYS);
+        if (!tabContent.getChildren().get(1).equals(statsContent)) {
+            tabContent.getChildren().set(1, statsContent);
+            tabContent.getChildren().add(bottomStats);
+            bottomStats.setMaxHeight(200);
+            bottomStats.setPrefHeight(200);
+            VBox.setVgrow(tabContent.getChildren().get(1), Priority.ALWAYS);
+        }
     }
 
     public void switchToGraphs() {
         graphsButton.setSelected(true);
-        tabContent.getChildren().set(1, graphsContent);
-        VBox.setVgrow(tabContent.getChildren().get(1), Priority.ALWAYS);
+        if (!tabContent.getChildren().get(1).equals(graphsContent)) {
+            tabContent.getChildren().set(1, graphsContent);
+            tabContent.getChildren().add(bottomStats);
+            VBox.setVgrow(tabContent.getChildren().get(1), Priority.ALWAYS);
+        }
     }
 }

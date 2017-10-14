@@ -83,8 +83,8 @@ public class StartPageController {
                     readCompsTask.getException().printStackTrace();
                     new ErrorMessagePopup(readCompsTask.getException().getMessage());});
                 readCompsTask.run();
-
                 reader.readEvents(Main.comps);
+                StreakCalculator.calculatePbs();
                 reader.getYearTreeMap(Main.comps);
                 return null;
             }

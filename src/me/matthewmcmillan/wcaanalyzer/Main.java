@@ -12,17 +12,18 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 
 public class Main extends Application {
     public static ArrayList<Competition> comps;
-    public static ArrayList<Event> events;
+    public static LinkedHashMap<String, Event> events;
     public static String competitorName;
     public static String WCAID;
     public static Scene mainScene;
     public static Parent mainParent;
     public static Stage mainStage;
-    public static final String VERSION = "2.2";
+    public static final String VERSION = "2.3";
     public static StartPageController mainController;
 
     @Override

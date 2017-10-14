@@ -1,15 +1,16 @@
 package me.matthewmcmillan.wcaanalyzer;
 
-import javafx.util.StringConverter;
 
 public abstract class Result implements Comparable<Result> {
     String round;
     Competition comp;
+    Event event;
     boolean DNF = false, DNS = false;
 
-    public Result(String resultString, Competition comp, String round) {
+    public Result(String resultString, Competition comp, Event event, String round) {
         this.comp = comp;
         this.round = round;
+        this.event = event;
 
         if (resultString.equals("DNF")) {
             DNF = true;
@@ -17,6 +18,14 @@ public abstract class Result implements Comparable<Result> {
             DNS = true;
         } else {
             customParseResultString(resultString);
+        }
+    }
+
+    // increments number of pbs in event
+    public void setPbIfCompleted() {
+        if (!isDNS() && !isDNF()) {
+            event.incrementPbsBy(1);
+            Main.events.get(event.getName()).incrementPbsBy(1);
         }
     }
 

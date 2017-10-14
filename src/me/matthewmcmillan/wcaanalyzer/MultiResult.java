@@ -1,8 +1,8 @@
 package me.matthewmcmillan.wcaanalyzer;
 
 public class MultiResult extends Result{
-    public MultiResult(String resultString, Competition comp, String round) {
-        super(resultString, comp, round);
+    public MultiResult(String resultString, Competition comp, Event event, String round) {
+        super(resultString, comp, event, round);
     }
 
     @Override
